@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option go_package = "github.com/vesari/grpccalc/grpccalc";
+
+package grpccalc;
+
+// The calculation service definition.
+service Calc {
+  // Adds 2 numbers
+  rpc Add (AddRequest) returns (ValueReply) {}
+}
+
+// The request containing the 2 values to add.
+message AddRequest {
+  int64 number1 = 1;
+  int64 number2 = 2;
+}
+
+// The response containing the addition result
+message ValueReply {
+  int64 value = 1;
+}
