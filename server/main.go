@@ -27,6 +27,11 @@ func (s *server) Add(ctx context.Context, in *pb.AddRequest) (*pb.ValueReply, er
 	return &pb.ValueReply{Value: result}, nil
 }
 
+func (s *server) MultiplyF(ctx context.Context, in *pb.MultiplyFRequest) (*pb.ValueFReply, error) {
+	result := in.Number1 * in.Number2
+	return &pb.ValueFReply{Value: result}, nil
+}
+
 func main() {
 	lis, err := net.Listen("tcp", port)
 	if err != nil {

@@ -8,6 +8,7 @@ package grpccalc;
 service Calc {
   // Adds 2 numbers
   rpc Add (AddRequest) returns (ValueReply) {}
+  rpc MultiplyF(MultiplyFRequest) returns (ValueFReply) {}
 }
 
 // The request containing the 2 values to add.
@@ -16,7 +17,15 @@ message AddRequest {
   int64 number2 = 2;
 }
 
-// The response containing the addition result
+message MultiplyFRequest {
+  double number1 = 1;
+  double number2 = 2;
+}
+
 message ValueReply {
   int64 value = 1;
+}
+
+message ValueFReply {
+  double value = 1;
 }

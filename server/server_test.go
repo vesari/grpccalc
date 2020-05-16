@@ -31,6 +31,21 @@ func TestAdd(t *testing.T) {
 	})
 }
 
+func TestMultiplyF(t *testing.T) {
+	p := startServer(t)
+	c := newClient(t, p)
+
+	t.Log("Starting tests")
+	t.Run("1.2 and 2.1", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		t.Cleanup(cancel)
+		r, err := c.MultiplyF(ctx, &pb.MultiplyFRequest{Number1: 1.2, Number2: 2.1})
+		require.NoError(t, err)
+
+		assert.Equal(t, 2.52, r.Value)
+	})
+}
+
 func startServer(t *testing.T) int {
 	lis, err := net.Listen("tcp", ":0")
 	require.NoError(t, err)
