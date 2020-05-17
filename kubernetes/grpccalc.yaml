@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpccalc
+spec:
+  replicas:
+    2
+  selector:
+    matchLabels:
+      app: grpccalc
+  template:
+    metadata:
+      labels:
+        app: grpccalc
+    spec:
+      containers:
+        - name: grpccalc
+          image: ariannavespri/grpccalc:0.1.0
+          ports:
+            - name: grpc
+              containerPort: 50051
+          env:
+            - name: PORT
+              value: "50051"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grpccalc
+spec:
+  ports:
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+  selector:
+    app: grpccalc
