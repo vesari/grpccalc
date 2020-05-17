@@ -5,15 +5,15 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
+	"os"
+	"strconv"
+	"strings"
 
 	pb "github.com/vesari/grpccalc/grpccalc"
 	"google.golang.org/grpc"
-)
-
-const (
-	port = ":50051"
 )
 
 // server is used to implement grpccalc.CalcServer.
@@ -33,13 +33,22 @@ func (s *server) MultiplyF(ctx context.Context, in *pb.MultiplyFRequest) (*pb.Va
 }
 
 func main() {
-	lis, err := net.Listen("tcp", port)
+	portStr := strings.TrimSpace(os.Getenv("PORT"))
+	if portStr == "" {
+		portStr = "50051"
+	}
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		log.Fatalf("Env var PORT has invalid value %q", portStr)
+	}
+	addr := fmt.Sprintf(":%d", port)
+	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
 	pb.RegisterCalcServer(s, &server{})
-	log.Printf("Running the server!")
+	log.Printf("Listening on port %d", port)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

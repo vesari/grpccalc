@@ -2,18 +2,16 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	pb "github.com/vesari/grpccalc/grpccalc"
 	"google.golang.org/grpc"
-)
-
-const (
-	address = "localhost:50051"
 )
 
 func add(ctx context.Context) {
@@ -38,7 +36,20 @@ func add(ctx context.Context) {
 }
 
 func newClient() (pb.CalcClient, io.Closer) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	portStr := strings.TrimSpace(os.Getenv("PORT"))
+	if portStr == "" {
+		portStr = "50051"
+	}
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		log.Fatalf("Invalid env var PORT: %q", portStr)
+	}
+	host := strings.TrimSpace(os.Getenv("HOST"))
+	if host == "" {
+		host = "localhost"
+	}
+	addr := fmt.Sprintf("%s:%d", host, port)
+	conn, err := grpc.Dial(addr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
