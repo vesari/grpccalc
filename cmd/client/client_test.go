@@ -39,6 +39,27 @@ func TestAdd(t *testing.T) {
 		result := getResult(fw)
 		assert.Equal(t, "3", result)
 	})
+
+	t.Run("Invalid operand 1", func(t *testing.T) {
+		logger, _ := setUpTest(t, []string{"add", "1.1", "2"})
+
+		err := realMain(logger)
+		require.EqualError(t, err, "unable to convert first operand to an integer")
+	})
+
+	t.Run("Invalid operand 2", func(t *testing.T) {
+		logger, _ := setUpTest(t, []string{"add", "1", "2.8"})
+
+		err := realMain(logger)
+		require.EqualError(t, err, "unable to convert second operand to an integer")
+	})
+
+	t.Run("Too few arguments", func(t *testing.T) {
+		logger, _ := setUpTest(t, []string{"add", "1"})
+
+		err := realMain(logger)
+		require.EqualError(t, err, "you have to provide 3 arguments")
+	})
 }
 
 func TestMultiplyF(t *testing.T) {
@@ -55,6 +76,47 @@ func TestMultiplyF(t *testing.T) {
 		result := getResult(fw)
 
 		assert.Equal(t, "2.73", result)
+	})
+
+	t.Run("Invalid operand 1", func(t *testing.T) {
+		logger, _ := setUpTest(t, []string{"multiplyF", "a", "2"})
+
+		err := realMain(logger)
+		require.EqualError(t, err, "unable to convert first operand to a float")
+	})
+
+	t.Run("Invalid operand 2", func(t *testing.T) {
+		logger, _ := setUpTest(t, []string{"multiplyF", "1.2", "a"})
+
+		err := realMain(logger)
+		require.EqualError(t, err, "unable to convert second operand to a float")
+	})
+
+	t.Run("Too few arguments", func(t *testing.T) {
+		logger, _ := setUpTest(t, []string{"multiplyF", "1"})
+
+		err := realMain(logger)
+		require.EqualError(t, err, "you have to provide 3 arguments")
+	})
+}
+
+func TestClient(t *testing.T) {
+	startServer(t)
+
+	t.Log("Starting tests")
+
+	t.Run("Wrong operand", func(t *testing.T) {
+		logger, _ := setUpTest(t, []string{"wrong", "1", "2"})
+
+		err := realMain(logger)
+		require.EqualError(t, err, `invalid operator "wrong"`)
+	})
+
+	t.Run("Too few arguments", func(t *testing.T) {
+		logger, _ := setUpTest(t, []string{})
+
+		err := realMain(logger)
+		require.EqualError(t, err, "not enough arguments")
 	})
 }
 

@@ -110,9 +110,13 @@ func realMain(logger *log.Logger) error {
 	op := os.Args[1]
 	switch op {
 	case "add":
-		add(ctx, logger)
+		if err := add(ctx, logger); err != nil {
+			return err
+		}
 	case "multiplyF":
-		multiplyF(ctx, logger)
+		if err := multiplyF(ctx, logger); err != nil {
+			return err
+		}
 	default:
 		return fmt.Errorf("invalid operator %q", op)
 	}
