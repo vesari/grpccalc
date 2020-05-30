@@ -9,7 +9,7 @@ Dockerfile and the manifests in the kubernetes directory.
 
 ## Service architecture
 
-The repository contains both a server and a client, within server/ and client/,
+The repository contains both a server and a client, within cmd/server/ and cmd/client/,
 respectively. The client, which is for testing the service, is a CLI program that
 supports two subcommands: add and multiplyF. For an example of using it, see the
 section *Running*.
@@ -31,7 +31,7 @@ go run cmd/client/main.go multiplyF 1.2 2.5
 
 ## Testing
 
-The service has a test suite in server/server_test.go. Run it as follows:
+The service has a test suite in cmd/server/server_test.go and cmd/client/client_test.go. Run it as follows:
 
 ```
 go test ./...
