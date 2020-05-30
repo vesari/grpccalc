@@ -1,10 +1,9 @@
-//go:generate protoc -I../grpccalc/ --go_opt=paths=source_relative --go_out=plugins=grpc:../grpccalc ../grpccalc/grpccalc.proto
+//go:generate protoc -I../../grpccalc/ --go_opt=paths=source_relative --go_out=plugins=grpc:../../grpccalc ../../grpccalc/grpccalc.proto
 
 // Package main implements a server for the gRPCCalc service.
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net"
@@ -13,24 +12,9 @@ import (
 	"strings"
 
 	pb "github.com/vesari/grpccalc/grpccalc"
+	"github.com/vesari/grpccalc/server"
 	"google.golang.org/grpc"
 )
-
-// server is used to implement grpccalc.CalcServer.
-type server struct {
-	pb.UnimplementedCalcServer
-}
-
-// Add implements grpccalc.CalcServer
-func (s *server) Add(ctx context.Context, in *pb.AddRequest) (*pb.ValueReply, error) {
-	result := in.Number1 + in.Number2
-	return &pb.ValueReply{Value: result}, nil
-}
-
-func (s *server) MultiplyF(ctx context.Context, in *pb.MultiplyFRequest) (*pb.ValueFReply, error) {
-	result := in.Number1 * in.Number2
-	return &pb.ValueFReply{Value: result}, nil
-}
 
 func main() {
 	portStr := strings.TrimSpace(os.Getenv("PORT"))
@@ -47,7 +31,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterCalcServer(s, &server{})
+	pb.RegisterCalcServer(s, &server.Server{})
 	log.Printf("Listening on port %d", port)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

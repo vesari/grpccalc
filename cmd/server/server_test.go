@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	pb "github.com/vesari/grpccalc/grpccalc"
+	"github.com/vesari/grpccalc/server"
 	"google.golang.org/grpc"
 )
 
@@ -22,12 +23,12 @@ func TestAdd(t *testing.T) {
 
 	t.Log("Starting tests")
 	t.Run("1 and 2", func(t *testing.T) {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		t.Cleanup(cancel)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second) //timeout after 1 sec
+		t.Cleanup(cancel)                                                     //this is to cancel the context after the test if necessary
 		r, err := c.Add(ctx, &pb.AddRequest{Number1: 1, Number2: 2})
 		require.NoError(t, err)
 
-		assert.Equal(t, int64(3), r.Value)
+		assert.Equal(t, int64(3), r.Value) //making sure it's int64
 	})
 }
 
@@ -54,7 +55,7 @@ func startServer(t *testing.T) int {
 	p, err := strconv.Atoi(pStr)
 	require.NoError(t, err)
 	s := grpc.NewServer()
-	pb.RegisterCalcServer(s, &server{})
+	pb.RegisterCalcServer(s, &server.Server{})
 
 	go func() {
 		if err := s.Serve(lis); err != nil {

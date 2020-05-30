@@ -14,35 +14,42 @@ import (
 	"google.golang.org/grpc"
 )
 
-func add(ctx context.Context) {
+func add(ctx context.Context, logger *log.Logger) error {
 	if len(os.Args) != 4 {
-		log.Fatal("You have to provide 3 arguments")
+		return fmt.Errorf("you have to provide 3 arguments")
 	}
 	operand1, err := strconv.ParseInt(os.Args[2], 10, 64)
 	if err != nil {
-		log.Fatal("Unable to convert first operand to an integer")
+		return fmt.Errorf("unable to convert first operand to an integer")
 	}
 	operand2, err := strconv.ParseInt(os.Args[3], 10, 64)
 	if err != nil {
-		log.Fatal("Unable to convert second operand to an integer")
+		return fmt.Errorf("unable to convert second operand to an integer")
 	}
-	c, conn := newClient()
+
+	c, conn, err := newClient()
+	if err != nil {
+		return err
+	}
 	defer conn.Close()
+
 	r, err := c.Add(ctx, &pb.AddRequest{Number1: operand1, Number2: operand2})
 	if err != nil {
-		log.Fatalf("could not add: %v", err)
+		return fmt.Errorf("could not add: %w", err)
 	}
-	log.Printf("Result: %d", r.GetValue())
+
+	logger.Printf("Result: %d", r.GetValue())
+	return nil
 }
 
-func newClient() (pb.CalcClient, io.Closer) {
+func newClient() (pb.CalcClient, io.Closer, error) {
 	portStr := strings.TrimSpace(os.Getenv("PORT"))
 	if portStr == "" {
 		portStr = "50051"
 	}
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
-		log.Fatalf("Invalid env var PORT: %q", portStr)
+		return nil, nil, fmt.Errorf("invalid env var PORT: %q", portStr)
 	}
 	host := strings.TrimSpace(os.Getenv("HOST"))
 	if host == "" {
@@ -51,47 +58,64 @@ func newClient() (pb.CalcClient, io.Closer) {
 	addr := fmt.Sprintf("%s:%d", host, port)
 	conn, err := grpc.Dial(addr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		return nil, nil, fmt.Errorf("did not connect: %w", err)
 	}
 	c := pb.NewCalcClient(conn)
 
-	return c, conn
+	return c, conn, nil
 }
 
-func multiplyF(ctx context.Context) {
+func multiplyF(ctx context.Context, logger *log.Logger) error {
 	if len(os.Args) != 4 {
-		log.Fatal("You have to provide 3 arguments")
+		return fmt.Errorf("you have to provide 3 arguments")
 	}
 	operand1, err := strconv.ParseFloat(os.Args[2], 64)
 	if err != nil {
-		log.Fatal("Unable to convert first operand to a float")
+		return fmt.Errorf("unable to convert first operand to a float")
 	}
 	operand2, err := strconv.ParseFloat(os.Args[3], 64)
 	if err != nil {
-		log.Fatal("Unable to convert second operand to a float")
+		return fmt.Errorf("unable to convert second operand to a float")
 	}
-	c, conn := newClient()
+
+	c, conn, err := newClient()
+	if err != nil {
+		return err
+	}
 	defer conn.Close()
+
 	r, err := c.MultiplyF(ctx, &pb.MultiplyFRequest{Number1: operand1, Number2: operand2})
 	if err != nil {
-		log.Fatalf("could not multiply: %v", err)
+		return fmt.Errorf("could not multiply: %w", err)
 	}
-	log.Printf("Result: %.2f", r.GetValue())
+
+	logger.Printf("Result: %.2f", r.GetValue())
+	return nil
 }
 
 func main() {
+	logger := log.New(os.Stderr, "", log.LstdFlags)
+	err := realMain(logger)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+}
+
+func realMain(logger *log.Logger) error {
 	if len(os.Args) < 2 {
-		log.Fatal("Not enough arguments")
+		return fmt.Errorf("not enough arguments")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	op := os.Args[1]
 	switch op {
 	case "add":
-		add(ctx)
+		add(ctx, logger)
 	case "multiplyF":
-		multiplyF(ctx)
+		multiplyF(ctx, logger)
 	default:
-		log.Fatalf("Invalid operator %q", op)
+		return fmt.Errorf("invalid operator %q", op)
 	}
+
+	return nil
 }

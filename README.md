@@ -12,7 +12,7 @@ Dockerfile and the manifests in the kubernetes directory.
 The repository contains both a server and a client, within server/ and client/,
 respectively. The client, which is for testing the service, is a CLI program that
 supports two subcommands: add and multiplyF. For an example of using it, see the
-section *Running*. 
+section *Running*.
 
 ## Requirements
 
@@ -23,10 +23,10 @@ section *Running*.
 
 ```
 go generate ./...
-go run server/main.go
+go run cmd/server/main.go
 # In another terminal
-go run client/main.go add 1 2
-go run client/main.go multiplyF 1.2 2.5
+go run cmd/client/main.go add 1 2
+go run cmd/client/main.go multiplyF 1.2 2.5
 ```
 
 ## Testing
