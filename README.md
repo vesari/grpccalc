@@ -64,8 +64,7 @@ This will create a Deployment and corresponding Service in the cluster.
 
 The service is currently not accessible to clients outside of the cluster.
 To enable such access, one would have to add an ingress controller and a service
-ingress to the Kubernetes cluster. This is a quite complex task, and I've decided
-it's not necessary for now.
+ingress to the Kubernetes cluster. I've decided it's not necessary for now.
 
 ### Expanding the service to use an event store
 
