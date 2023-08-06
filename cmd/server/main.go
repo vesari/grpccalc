@@ -1,4 +1,4 @@
-//go:generate protoc -I ./proto --go_out ./grpccalc --go_opt paths=source_relative --go-grpc_out ./grpccalc --go-grpc_opt paths=source_relative ./grpccalc/grpccalc.proto
+//go:generate protoc -I../../grpccalc --go_out ../../grpccalc --go_opt paths=source_relative --go-grpc_out ../../grpccalc --go-grpc_opt paths=source_relative grpccalc.proto
 
 // Package main implements a server for the gRPCCalc service.
 package main
